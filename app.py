@@ -70,6 +70,8 @@ if 'messages' not in st.session_state:
     st.session_state['messages'] = []
 if 'mood_tracker' not in st.session_state:
     st.session_state['mood_tracker'] = []
+if 'coping_strategy' not in st.session_state:
+    st.session_state['coping_strategy'] = None
 
 with st.form(key='chat_form'):
     user_message = st.text_input("You:")
@@ -79,7 +81,7 @@ if submit_button and user_message:
     st.session_state['messages'].append(("You", user_message))
 
     sentiment, polarity = analyze_sentiment(user_message)
-    coping_strategy = provide_coping_strategy(sentiment)
+    st.session_state['coping_strategy'] = provide_coping_strategy(sentiment)
 
     response = generate_response(user_message)
 
@@ -97,9 +99,11 @@ if st.session_state['mood_tracker']:
     mood_data = pd.DataFrame(st.session_state['mood_tracker'], columns=["Message", "Sentiment", "Polarity"])
     st.line_chart(mood_data['Polarity'])
 
-# Display coping strategies
-if user_message:
-    st.write(f"Suggested Coping Strategy: {coping_strategy}")
+# Display the latest coping strategy, if one has been generated
+if st.session_state['coping_strategy']:
+    st.write(
+        f"Suggested Coping Strategy: {st.session_state['coping_strategy']}"
+    )
 
 # Display resources
 st.sidebar.title("Resources")
